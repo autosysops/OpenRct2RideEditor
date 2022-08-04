@@ -1,5 +1,7 @@
 # OpenRCT2RideHeightChanger
-This is a simple plugin to raise/lower a complete ride by 1 (a ingame height unit is 2 so you can put rides in between two heights).
+This is a simple plugin to raise/lower a ride or part of that ride by 1 (a ingame height unit is 2 so you can put rides in between two heights).
+
+![Alt text](.\screenshot.png "a title")
 
 # Usage
 Copy the RideHeight.js file to your OpenRCT2\plugin folder.

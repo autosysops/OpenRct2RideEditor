@@ -1,5 +1,13 @@
 // Global Vars
 var rideID = -1;
+var colourscheme = -1;
+var colourschemes = [
+    "All colour schemes",
+    "Main colour scheme",
+    "Alternative colour scheme 1",
+    "Alternative colour scheme 2",
+    "Alternative colour scheme 3"
+]
 
 var change_ride_height = function (offset) {
     // Iterate every tile in the map
@@ -14,7 +22,9 @@ var change_ride_height = function (offset) {
 
                     if (element.type === 'track') {
                         if (element.ride == rideID) {
-                            element.baseHeight = element.baseHeight + offset;
+                            if(colourscheme == -1 || colourscheme == element.colourScheme) {
+                                element.baseHeight = element.baseHeight + offset;
+                            }
                         }
                     }
                 }
@@ -40,7 +50,7 @@ function rides_window() {
         y: 45,
         width: 210,
         height: 15,
-        name: "filter_dropdown",
+        name: "ride_dropdown",
         text: "",
         items: map.rides.map(function (ride) {
             return [ride.id, ride.name].join(" - ");
@@ -51,10 +61,24 @@ function rides_window() {
         }
     });
     widgets.push({
+        type: "dropdown",
+        x: 5,
+        y: 70,
+        width: 210,
+        height: 15,
+        name: "colour_dropdown",
+        text: "",
+        items: colourschemes,
+        selectedIndex: 0,
+        onChange: function onChange(e) {
+            colourscheme = (e-1);
+        }
+    });
+    widgets.push({
         type: 'button',
         name: "move-ride-up",
         x: 5,
-        y: 70,
+        y: 95,
         width: 90,
         height: 15,
         text: "Height +1",
@@ -66,7 +90,7 @@ function rides_window() {
         type: 'button',
         name: "move-ride-down",
         x: 110,
-        y: 70,
+        y: 95,
         width: 90,
         height: 15,
         text: "Height -1",
@@ -78,7 +102,7 @@ function rides_window() {
         classification: 'Ride Height Changer',
         title: "Ride Height",
         width: 220,
-        height: 100,
+        height: 120,
         x: 20,
         y: 50,
         colours: [24, 24],
@@ -95,7 +119,7 @@ var main = function () {
 
 registerPlugin({
     name: 'Ride Height',
-    version: '1.0',
+    version: '1.1',
     authors: ['AutoSysOps (Levis)'],
     type: 'remote',
     main: main
