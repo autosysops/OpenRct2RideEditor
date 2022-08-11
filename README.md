@@ -1,10 +1,20 @@
-# OpenRCT2RideHeightChanger
-This is a simple plugin to raise/lower a ride or part of that ride by 1 (a ingame height unit is 2 so you can put rides in between two heights).
+# OpenRCT2 Ride Editor
+This plugin allows you to edit parts of a ride based on the colourscheme. You can:
+- raise/lower the track
+- make the track invisible
+- change the type of the track
 
 ![Screenshot](https://github.com/autosysops/OpenRCT2RideHeightChanger/raw/main/screenshot.png "Screenshot")
 
 # Usage
-Copy the RideHeight.js file to your OpenRCT2\plugin folder.
-In game the menu "Ride Height" will appear, click this.
-In the menu which opens select the ride you want to change.
-Click the button "Height +1" or "Height -1" to raise/lower the ride.
+Copy the RideEditor.js file to your OpenRCT2\plugin folder.
+In game the menu "Ride Editor" will appear.
+If you still have a RideHeight.js file in your plugin folder remove this one.
+
+# Changelog
+
+2.0 - Improved UI and added option to make parts invisble and change the ride type. Renamed to "Ride Editor"
+
+1.1 - Added option to select a specific colourscheme to apply changes to.
+
+1.0 - Initial version.
