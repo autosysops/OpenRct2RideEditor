@@ -3,6 +3,7 @@ This plugin allows you to edit parts of a ride based on the colourscheme. You ca
 - raise/lower the track
 - make the track invisible
 - change the type of the track
+- add/remove chainlift to the track
 
 ![Screenshot](https://github.com/autosysops/OpenRCT2RideHeightChanger/raw/main/screenshot.png "Screenshot")
 
