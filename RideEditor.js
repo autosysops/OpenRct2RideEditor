@@ -7,10 +7,12 @@ var rideType = -1;
 var colourScheme = -1;
 var visibilityOption = 0;
 var heightoffset = 0;
+var chainOption = 0;
 
 var changeType = false;
 var changeHeight = false;
 var changeVisibility = false;
+var changeChain = false;
 
 // Enums
 var colourSchemes = [
@@ -20,10 +22,17 @@ var colourSchemes = [
     "Alternative colour scheme 2",
     "Alternative colour scheme 3"
 ]
+
 var visibilityOptions = [
     "Visible",
     "Invisible"
 ]
+
+var chainOptions = [
+    "No chainlift",
+    "Has chainlift"
+]
+
 var rideTypes = create_ridetype_list();
 
 function create_ridetype_list() {
@@ -283,12 +292,12 @@ function reset_widget_colourScheme() {
 }
 
 function validate_selection() {
-    if(rideID == -1) {
+    if (rideID == -1) {
         ui.showError("Ride Editor Error:", "Select a ride first.")
         return false;
     }
 
-    if(!changeType && !changeVisibility && !changeHeight) {
+    if (!changeType && !changeVisibility && !changeHeight &&!changeChain) {
         ui.showError("Ride Editor Error:", "Select at least one option to change.")
         return false;
     }
@@ -316,7 +325,7 @@ var change_ride = function () {
                     if (element.type === 'track') {
                         if (element.ride == rideID) {
                             if (colourScheme == -1 || colourScheme == element.colourScheme) {
-                                
+
                                 if (changeHeight) {
                                     element.baseHeight = element.baseHeight + heightoffset;
                                 }
@@ -327,12 +336,23 @@ var change_ride = function () {
                                             break;
                                         case 1: element.isHidden = true;
                                             break;
-                                        default : element.isHidden = element.isHidden;
+                                        default: element.isHidden = element.isHidden;
                                             break;
                                     }
                                 }
 
-                                if(changeType) {
+                                if (changeChain) {
+                                    switch (chainOption) {
+                                        case 0: element.hasChainLift = false;
+                                            break;
+                                        case 1: element.hasChainLift = true;
+                                            break;
+                                        default: element.hasChainLift = element.hasChainLift;
+                                            break;
+                                    }
+                                }
+
+                                if (changeType) {
                                     element.rideType = rideType;
                                 }
                             }
@@ -395,7 +415,7 @@ function rides_window() {
         x: 5,
         y: 95,
         width: 290,
-        height: 100,
+        height: 125,
         text: "Edit Ride"
     });
     widgets.push({
@@ -466,12 +486,40 @@ function rides_window() {
         }
     });
 
+    // Edit - Chainlift
+    widgets.push({
+        type: 'checkbox',
+        name: 'edit_chain',
+        x: 10,
+        y: 175,
+        width: 15,
+        height: 15,
+        isChecked: changeChain,
+        text: "Chainlift",
+        onChange: function onChange(e) {
+            changeChain = inverse_boolean(changeChain);
+        }
+    });
+    widgets.push({
+        type: "dropdown",
+        name: "chain_dropdown",
+        x: 90,
+        y: 175,
+        width: 100,
+        height: 15,
+        items: chainOptions,
+        selectedIndex: 0,
+        onChange: function onChange(e) {
+            chainOption = e;
+        }
+    });
+
     // Edit - Height
     widgets.push({
         type: 'checkbox',
         name: 'edit_height',
         x: 10,
-        y: 175,
+        y: 200,
         width: 15,
         height: 15,
         isChecked: changeHeight,
@@ -484,7 +532,7 @@ function rides_window() {
         type: "spinner",
         name: "height_spinner",
         x: 90,
-        y: 175,
+        y: 200,
         width: 100,
         height: 15,
         text: "0.0  Units",
@@ -501,12 +549,12 @@ function rides_window() {
         type: 'button',
         name: "apply-button",
         x: 70,
-        y: 205,
+        y: 230,
         width: 160,
         height: 20,
         text: "Apply selected changes",
         onClick: function onClick() {
-            if(validate_selection()) {
+            if (validate_selection()) {
                 change_ride();
             }
         }
@@ -514,9 +562,9 @@ function rides_window() {
 
     window = ui.openWindow({
         classification: 'Ride Editor',
-        title: "Ride Editor 2.0",
+        title: "Ride Editor 2.1 (by Levis)",
         width: 300,
-        height: 230,
+        height: 255,
         x: 20,
         y: 50,
         colours: [24, 24],
@@ -533,7 +581,7 @@ var main = function () {
 
 registerPlugin({
     name: 'Ride Editor',
-    version: '2.0',
+    version: '2.1',
     authors: ['AutoSysOps (Levis)'],
     type: 'remote',
     licence: 'MIT',

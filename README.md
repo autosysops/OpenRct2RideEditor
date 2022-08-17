@@ -13,6 +13,8 @@ If you still have a RideHeight.js file in your plugin folder remove this one.
 
 # Changelog
 
+2.1 - Added option to add/remove chainlift to the track
+
 2.0 - Improved UI and added option to make parts invisble and change the ride type. Renamed to "Ride Editor"
 
 1.1 - Added option to select a specific colourscheme to apply changes to.
