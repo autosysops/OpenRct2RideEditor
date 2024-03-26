@@ -266,7 +266,7 @@ function get_ridetype_name(ridetype) {
     }
 }
 
-function update_widget_ridetype() {
+function reset_widget_ridetype_dropdown() {
     var ridetypedropdown = window.findWidget("ridetype_dropdown");
 
     for (var r = 0; r <= MAX_RIDETYPES; r++) {
@@ -276,6 +276,18 @@ function update_widget_ridetype() {
     }
 
     ridetypedropdown.selectedIndex = (r);
+}
+
+function update_widget_ridetype(e) {
+    update_global_ride(e);
+    reset_widget_ridetype_dropdown();
+    reset_widget_colourScheme();
+    context.getParkStorage('Levis.RideEditor').set('selected_ride', e)
+}
+
+function update_global_ride(index) {
+    rideID = map.rides[index].id;
+    rideType = map.rides[index].object.rideType[0];
 }
 
 function update_widget_height(widgetname, increase) {
@@ -291,13 +303,36 @@ function reset_widget_colourScheme() {
     colourdropdown.selectedIndex = 0;
 }
 
+function get_last_selection() {
+    var index = context.getParkStorage('Levis.RideEditor').get('selected_ride')
+    if(index == null) {
+        return -1
+    }
+    if(index > map.rides.length) {
+        return -1
+    }
+    // Set the global ride id as it's stored
+    update_global_ride(index);
+    return index
+}
+
+function find_rideType() {
+    for (var r = 0; r < rideTypes.length; r++) {
+        if (rideTypes[r].id == rideType) {
+            return r
+        }
+    }
+
+    return -1
+}
+
 function validate_selection() {
     if (rideID == -1) {
         ui.showError("Ride Editor Error:", "Select a ride first.")
         return false;
     }
 
-    if (!changeType && !changeVisibility && !changeHeight &&!changeChain) {
+    if (!changeType && !changeVisibility && !changeHeight && !changeChain) {
         ui.showError("Ride Editor Error:", "Select at least one option to change.")
         return false;
     }
@@ -312,7 +347,7 @@ function inverse_boolean(boolean) {
 }
 
 var change_ride = function () {
-    // Iterate every tile in the 
+    // Iterate every tile in the
     if (rideID >= 0) {
         for (var y = 0; y < map.size.y; y++) {
             for (var x = 0; x < map.size.x; x++) {
@@ -386,12 +421,9 @@ function rides_window() {
         items: map.rides.map(function (ride) {
             return [ride.id, ride.name].join(" - ");
         }),
-        selectedIndex: -1,
+        selectedIndex: get_last_selection(),
         onChange: function onChange(e) {
-            rideID = map.rides[e].id;
-            rideType = map.rides[e].object.rideType[0];
-            update_widget_ridetype();
-            reset_widget_colourScheme();
+            update_widget_ridetype(e);
         }
     });
     widgets.push({
@@ -452,7 +484,7 @@ function rides_window() {
         items: rideTypes.map(function (ridetype) {
             return ridetype.name;
         }),
-        selectedIndex: -1,
+        selectedIndex: find_rideType(),
         onChange: function onChange(e) {
             rideType = rideTypes[e].id;
         }
@@ -562,7 +594,7 @@ function rides_window() {
 
     window = ui.openWindow({
         classification: 'Ride Editor',
-        title: "Ride Editor 2.1 (by Levis)",
+        title: "Ride Editor 2.2 (by Levis)",
         width: 300,
         height: 255,
         x: 20,
