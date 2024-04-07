@@ -267,22 +267,48 @@ function get_ridetype_name(ridetype) {
 }
 
 function reset_widget_ridetype_dropdown() {
-    var ridetypedropdown = window.findWidget("ridetype_dropdown");
+    var ridetypedropdown = ui.getWindow("Ride Editor").findWidget("ridetype_dropdown");
 
     for (var r = 0; r <= MAX_RIDETYPES; r++) {
         if (rideTypes[r].id == rideType) {
-            break;
+            ridetypedropdown.selectedIndex = (r);
+            return;
         }
     }
-
-    ridetypedropdown.selectedIndex = (r);
 }
 
-function update_widget_ridetype(e) {
-    update_global_ride(e);
+function update_widget_ridetype(id) {
+    var index = find_index_of_ride_with_id(id)
+    update_global_ride(index);
+    set_widget_ride();
     reset_widget_ridetype_dropdown();
     reset_widget_colourScheme();
-    context.getParkStorage('Levis.RideEditor').set('selected_ride', e)
+    context.getParkStorage('Levis.RideEditor').set('selected_ride', id)
+}
+
+function find_index_of_ride_with_id(id) {
+    for (var r = 0; r < (map.rides.length); r++) {
+        if (map.rides[r].id == id) {
+            return r
+        }
+    }
+    return 0;
+}
+
+function find_last_ride_id() {
+    var id = 0
+    for (var r = 0; r < (map.rides.length); r++) {
+        if (map.rides[r].id > id) {
+            id = map.rides[r].id
+        }
+    }
+    return id;
+}
+
+function set_widget_ride() {
+    var ridebox = ui.getWindow("Ride Editor").findWidget("ride");
+    var index = find_index_of_ride_with_id(rideID);
+    ridebox.text = [index, map.rides[index].name].join(" - ");
 }
 
 function update_global_ride(index) {
@@ -291,28 +317,26 @@ function update_global_ride(index) {
 }
 
 function update_widget_height(widgetname, increase) {
-    var heightwidget = window.findWidget(widgetname);
+    var heightwidget = ui.getWindow("Ride Editor").findWidget(widgetname);
     heightoffset = heightoffset + increase
 
     heightwidget.text = (heightoffset / 2).toFixed(1) + "  Units"
 }
 
 function reset_widget_colourScheme() {
-    var colourdropdown = window.findWidget("colour_dropdown");
+    var colourdropdown = ui.getWindow("Ride Editor").findWidget("colour_dropdown");
 
     colourdropdown.selectedIndex = 0;
 }
 
 function get_last_selection() {
     var index = context.getParkStorage('Levis.RideEditor').get('selected_ride')
-    if(index == null) {
+    if (index == null) {
         return -1
     }
-    if(index > map.rides.length) {
+    if (index > map.rides.length) {
         return -1
     }
-    // Set the global ride id as it's stored
-    update_global_ride(index);
     return index
 }
 
@@ -411,26 +435,73 @@ function rides_window() {
         height: 65,
         text: "Select Ride"
     });
+
     widgets.push({
-        type: "dropdown",
-        name: "ride_dropdown",
+        type: "textbox",
+        name: "ride",
+        isDisabled: true,
         x: 10,
         y: 35,
-        width: 280,
+        width: 190,
         height: 15,
-        items: map.rides.map(function (ride) {
-            return [ride.id, ride.name].join(" - ");
-        }),
-        selectedIndex: get_last_selection(),
-        onChange: function onChange(e) {
-            update_widget_ridetype(e);
+        text: ""
+    });
+
+    widgets.push({
+        type: "button",
+        name: "nextride",
+        x: 205,
+        y: 35,
+        width: 25,
+        height: 25,
+        border: true,
+        image: "arrow_up",
+        tooltip: "go to the next ride",
+        onClick: function onClick() {
+            update_widget_ridetype(rideID + 1);
         }
     });
+
+    widgets.push({
+        type: "button",
+        name: "prevride",
+        x: 235,
+        y: 35,
+        width: 25,
+        height: 25,
+        border: true,
+        image: "arrow_down",
+        tooltip: "go to the previous ride",
+        onClick: function onClick() {
+            if (rideID == 0) {
+                update_widget_ridetype(find_last_ride_id());
+            }
+            else {
+                update_widget_ridetype(rideID - 1);
+            }
+        }
+    });
+
+    widgets.push({
+        type: "button",
+        name: "selectride",
+        x: 265,
+        y: 35,
+        width: 25,
+        height: 25,
+        border: true,
+        image: 5187,
+        tooltip: "select a ride",
+        onClick: function onClick() {
+            ride_select_window()
+        }
+    });
+
     widgets.push({
         type: "dropdown",
         name: "colour_dropdown",
         x: 10,
-        y: 60,
+        y: 65,
         width: 280,
         height: 15,
         items: colourSchemes,
@@ -594,7 +665,7 @@ function rides_window() {
 
     window = ui.openWindow({
         classification: 'Ride Editor',
-        title: "Ride Editor 2.2 (by Levis)",
+        title: "Ride Editor 2.3 (by Levis)",
         width: 300,
         height: 255,
         x: 20,
@@ -604,18 +675,82 @@ function rides_window() {
     });
 }
 
+function ride_select_window() {
+    widgets = []
+    // Columns for list
+    var columns = [
+        {
+            canSort: true,
+            header: "ride",
+            ratioWidth: 9
+        },
+        {
+            canSort: true,
+            header: "id",
+            ratioWidth: 1,
+            sortOrder: "ascending"
+        }
+    ]
+
+    // Ride Selection
+    widgets.push({
+        type: 'label',
+        name: 'Explain',
+        x: 5,
+        y: 20,
+        width: 175,
+        height: 15,
+        text: "Click the column headers to sort"
+    });
+
+    widgets.push({
+        type: 'listview',
+        name: 'list_rides',
+        x: 5,
+        y: 35,
+        width: 195,
+        height: 215,
+        scrollbars: "vertical",
+        isStriped: false,
+        showColumnHeaders: true,
+        columns: columns,
+        items: map.rides.map(function (ride) {
+            return [ride.name, ""+ride.id];
+        }),
+        selectedCell: 0,
+        canSelect: false,
+        onClick: function onClick(item, column) {
+            update_widget_ridetype(map.rides[item].id);
+        }
+    });
+
+    window = ui.openWindow({
+        classification: 'Select Ride',
+        title: "Select the ride you want to edit",
+        width: 200,
+        height: 255,
+        x: 350,
+        y: 50,
+        colours: [24, 24], //12
+        widgets: widgets
+    });
+}
+
 var main = function () {
     // Add a menu item under the map icon on the top toolbar
     ui.registerMenuItem("Ride Editor", function () {
         rides_window();
+        // Update the last selected ride
+        update_widget_ridetype(get_last_selection());
     });
 };
 
 registerPlugin({
     name: 'Ride Editor',
-    version: '2.1',
+    version: '2.3',
     authors: ['AutoSysOps (Levis)'],
     type: 'remote',
     licence: 'MIT',
+    targetApiVersion: 34,
     main: main
 });
