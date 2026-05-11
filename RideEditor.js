@@ -261,6 +261,14 @@ function get_ridetype_name(ridetype) {
             break;
         case 100: return "Alpine Coaster"
             break;
+        case 101: return "Classic Wooden Roller Coaster"
+			break;
+		case 102: return "Classic Stand-up Roller Coaster"
+			break;
+		case 103: return "LSM Launched Roller Coaster"
+			break;
+		case 104: return "Classic Wooden Twister Roller Coaster"
+			break;
         default: return "???"
             break;
     }
@@ -747,7 +755,7 @@ var main = function () {
 
 registerPlugin({
     name: 'Ride Editor',
-    version: '2.3',
+    version: '2.4',
     authors: ['AutoSysOps (Levis)'],
     type: 'remote',
     licence: 'MIT',
