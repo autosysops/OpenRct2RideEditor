@@ -673,7 +673,7 @@ function rides_window() {
 
     window = ui.openWindow({
         classification: 'Ride Editor',
-        title: "Ride Editor 2.3 (by Levis)",
+        title: "Ride Editor 2.4 (by Levis)",
         width: 300,
         height: 255,
         x: 20,
